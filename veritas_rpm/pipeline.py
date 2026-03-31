@@ -29,9 +29,10 @@ Typical usage
 The pipeline instantiates and owns all components:
     VeritasAgent → SentinelLayer → DirectorAgent → MetaSentinelAgent → DashboardService
 
-Dependencies are injected at construction time so each component can reference
-its downstream neighbour.  This pattern also makes unit testing straightforward:
-replace any component with a mock when constructing RPMPipeline.
+Dependencies are wired explicitly during construction so each component can
+reference the collaborators it needs. This pattern also makes unit testing
+straightforward: replace any component with a mock when constructing
+RPMPipeline.
 """
 
 from __future__ import annotations
@@ -138,9 +139,9 @@ class RPMPipeline:
 
         self.veritas.subscribe(_sentinel_and_context_update)
 
-        # Wire DashboardService back-references for feedback propagation
-        self.dashboard._veritas_agent = self.veritas
-        self.dashboard._meta_sentinel = self.meta
+        # Wire DashboardService feedback dependencies explicitly
+        self.dashboard.set_veritas_agent(self.veritas)
+        self.dashboard.set_meta_sentinel(self.meta)
 
     # ------------------------------------------------------------------
     # Convenience ingest delegates
